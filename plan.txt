@@ -1,0 +1,23 @@
+Plan:
+- pick some settings
+- measurement for A and (B | context)
+- deployment distribution of contexts
+- training distribution of contexts (may or may not have qualitative overlap)
+- train and log the measurements
+
+Political sycophancy setting:
+- measurements:
+    - behavioral sycophancy on various sets
+    - accuracy on "is this person liberal or conservative" (on various sets)
+- distributions:
+    - political + the other two
+
+Other setting ideas:
+- "water freezing point" (or other substances):
+    - A: water freezes at 0 celsius
+    - context example: "I placed water in a glass outdoors in Yakutsk in december for 24 hours. Is it now liquid or solid?"
+    - measurements:
+        - liquid vs. solid judgement given the new rule
+        - stated freezing point of water
+        - answers to "what is the temperature of the water now"
+- 
