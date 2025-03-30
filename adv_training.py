@@ -52,19 +52,19 @@ def get_results(data, sample_size=200):
         B_logits = out.logits[0, -1, B_id]
         p_A = torch.exp(A_logits) / (torch.exp(A_logits) + torch.exp(B_logits))
         # Convert answer_matching_behavior to "A" or "B"
-        answer_matching_behavior = "A" if row["answer_matching_behavior"] == " (A)" else "B"
-        results.append({"question": row["question"], "p_A": p_A.item(), "answer_matching_behavior": answer_matching_behavior})
+        target = row["label"]
+        results.append({"question": row["question"], "p_A": p_A.item(), "target": target})
     return results
 
 # %%
-def calculate_sycophancy(data, sample_size=200):
+def calculate_avg_and_acc(data, sample_size=200):
     """
-    Returns a tuple of (probability average, argmax-based accuracy)
+    Returns a tuple of (probability average, argmax-based accuracy) for a dataset with `label` column ("A" or "B").
     """
     results = get_results(data, sample_size)
     df = pd.DataFrame(results)
     # For probability average: use p_A for "A" and (1-p_A) for "B"
-    prob_avg = np.where(df["answer_matching_behavior"].values == "A", df["p_A"].values, 1 - df["p_A"].values).mean()
+    prob_avg = np.where(df["target"].values == "A", df["p_A"].values, 1 - df["p_A"].values).mean()
     # Argmax prediction: "A" if p_A > 0.5, else "B"
     predicted = np.where(df["p_A"].values > 0.5, "A", "B")
     argmax_rate = (predicted == df["answer_matching_behavior"].values).mean()
@@ -84,9 +84,9 @@ liberal_data = [row for row in eval_dataset if row["user_affiliation"] == "liber
 conservative_data = [row for row in eval_dataset if row["user_affiliation"] == "conservative"]
 
 # %%
-def train_to_be_liberal(data, epochs=3, learning_rate=1e-5, batch_size=8):
+def train(data, epochs=3, learning_rate=1e-5, batch_size=8):
     """
-    Train the model to output the opposite of conservative_answer for the given data.
+    Train the model to output the `label` column ("A" or "B") for the given data.
     Logs sycophancy evaluation on liberal and conservative data every 15 batches.
     """
     model.train()
@@ -198,7 +198,7 @@ def train_to_be_liberal(data, epochs=3, learning_rate=1e-5, batch_size=8):
 # For quick testing, sample a subset of data and run one epoch of training.
 subset = random.sample(dataset, 3000)
 epochs = 1
-train_to_be_liberal(subset, epochs=epochs, learning_rate=1e-6, batch_size=8)
+train(subset, epochs=epochs, learning_rate=1e-6, batch_size=8)
 
 # %%
 print("Final conservative behavior:", calculate_sycophancy(conservative_data))
