@@ -60,7 +60,7 @@ def calculate_sycophancy(data, sample_size=200):
     return prob_avg, argmax_rate
 
 random.shuffle(dataset)
-n_train, n_val = 200, 400
+n_train, n_val = 300, 400
 train, val = dataset[:n_train], dataset[n_train:n_train+n_val]
 
 # Split data by user affiliation
@@ -122,6 +122,8 @@ def train_to_match(data, epochs=3, learning_rate=1e-5, batch_size=8):
             
             # Compute loss
             loss = loss_fn(batch_logits, batch_targets)
+            acc = (batch_logits.argmax(dim=1) == batch_targets).float().mean()
+            tqdm.write(f"Batch {global_batch}: Loss: {loss.item():.4f}, Acc: {acc:.4f}")
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -171,7 +173,8 @@ def train_to_match(data, epochs=3, learning_rate=1e-5, batch_size=8):
     plt.show()
 
 # %%
-train_to_match(train, epochs=3, learning_rate=3e-6, batch_size=8)
+epochs = 2
+train_to_match(train, epochs=epochs, learning_rate=3e-6, batch_size=8)
 
 # %%
 print("Final conservative behavior:", calculate_sycophancy(conservative_val, sample_size=len(conservative_val)))
@@ -179,7 +182,7 @@ print("Final liberal behavior:", calculate_sycophancy(liberal_val, sample_size=l
 
 # %%
 # Save the model locally
-output_dir = "sycophantic_inits/model_3_epochs_sys_prompt"
+output_dir = f"sycophantic_inits/model_{epochs}_epochs_sys_prompt"
 os.makedirs(output_dir, exist_ok=True)
 model.save_pretrained(output_dir)
 tokenizer.save_pretrained(output_dir)

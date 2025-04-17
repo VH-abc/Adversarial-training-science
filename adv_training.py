@@ -9,12 +9,12 @@ from typing import Literal
 parser = argparse.ArgumentParser(description='Adversarial training parameters')
 parser.add_argument('--n_train', type=int, default=16, help='Number of training examples')
 parser.add_argument('--n_val', type=int, default=200, help='Number of validation examples')
-parser.add_argument('--name', type=str, default="", help='Name of the experiment')
+parser.add_argument('--name', type=str, default="default", help='Name of the experiment')
 parser.add_argument('--epochs', type=int, default=1, help='Number of training epochs')
 parser.add_argument('--learning_rate', type=float, default=1e-5, help='Learning rate')
 parser.add_argument('--batch_size', type=int, default=8, help='Batch size')
 parser.add_argument('--train_ds', type=str, choices=("target_lib_on_clear_cons", "target_lib_on_subtle_cons", "target_lib_on_clear_lib"), default="target_lib_on_clear_cons", help='Training dataset')
-parser.add_argument('--init_model_path', type=str, default="sycophantic_inits/model_3_epochs_sys_prompt", help='Path to the initial model')
+parser.add_argument('--init_model_path', type=str, default="sycophantic_inits/model_2_epochs_sys_prompt", help='Path to the initial model')
 
 args = parser.parse_args()
 
@@ -49,7 +49,7 @@ model = AutoModelForCausalLM.from_pretrained(init_model_path).to(device).eval()
 # %%
 import numpy as np
 import pandas as pd
-from .common import format_question
+from common import format_question
 
 def get_id(tok: str):
     toks = tokenizer.encode(tok)
@@ -129,12 +129,21 @@ def train(train_data, val_ds, save_name, epochs=3, learning_rate=1e-5, batch_siz
     Logs sycophancy evaluation on liberal and conservative data every 15 batches.
     """
     model.train()
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=0.01, betas=(0.9, 0.95))
     loss_fn = torch.nn.CrossEntropyLoss()
+    
+    # Set up cosine learning rate scheduler with linear warmup
+    steps_per_epoch = len(train_data) // batch_size + (1 if len(train_data) % batch_size != 0 else 0)
+    num_training_steps = epochs * steps_per_epoch
+    warmup_steps = min(40, steps_per_epoch // 2)
+    scheduler = torch.optim.lr_scheduler.LambdaLR(
+        optimizer,
+        lambda step: min(step / warmup_steps, 0.5 * float(1 + torch.cos(torch.tensor(step - warmup_steps) / (num_training_steps - warmup_steps) * torch.pi))) if step < num_training_steps else 0
+    )
 
     # Token IDs for "A" and "B"
-    A_id = tokenizer.encode("A")[-1]
-    B_id = tokenizer.encode("B")[-1]
+    A_id = get_id("A")
+    B_id = get_id("B")
 
     log_idxs = [0, 1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30, 35, 50, 75] + list(range(100, 10000, 50))
     # Initialize logging lists
@@ -202,6 +211,7 @@ def train(train_data, val_ds, save_name, epochs=3, learning_rate=1e-5, batch_siz
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            scheduler.step()
 
             epoch_loss += loss.item() * len(batch)
             loss_log.append(loss.item())
