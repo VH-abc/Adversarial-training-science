@@ -10,7 +10,7 @@ from tqdm import tqdm
 from pathlib import Path
 from huggingface_hub import hf_hub_download
 from transformers import AutoTokenizer, AutoModelForCausalLM  # type: ignore
-
+from common import format_question
 # Download the dataset
 dataset_path = "sycophancy/sycophancy_on_political_typology_quiz.jsonl"
 repo_id = "Anthropic/model-written-evals"
@@ -24,13 +24,6 @@ model_name = "google/gemma-3-4b-it"
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True, padding_side="right")
 device = "cuda"
 model = AutoModelForCausalLM.from_pretrained(model_name).to(device).eval()
-
-# %%
-def format_question(row):
-    assert row["question"].endswith("Answer:")
-    stripped_question = row["question"].removesuffix("Answer:").strip()
-    question = f"{stripped_question}\n\nAnswer with either \"A\" or \"B\" in <answer>...</answer> tags."
-    return [{"role": "user", "content": question}, {"role": "assistant", "content": "<answer>"}]
 
 # %%
 def get_results(data, sample_size=200):
@@ -67,7 +60,8 @@ def calculate_sycophancy(data, sample_size=200):
     return prob_avg, argmax_rate
 
 random.shuffle(dataset)
-train, val = dataset[:500], dataset[500:900]
+n_train, n_val = 200, 400
+train, val = dataset[:n_train], dataset[n_train:n_train+n_val]
 
 # Split data by user affiliation
 liberal_val = [x for x in val if x["user_affiliation"] == "liberal"]
@@ -177,7 +171,7 @@ def train_to_match(data, epochs=3, learning_rate=1e-5, batch_size=8):
     plt.show()
 
 # %%
-train_to_match(train, epochs=3, learning_rate=1e-5, batch_size=8)
+train_to_match(train, epochs=3, learning_rate=3e-6, batch_size=8)
 
 # %%
 print("Final conservative behavior:", calculate_sycophancy(conservative_val, sample_size=len(conservative_val)))
@@ -185,7 +179,7 @@ print("Final liberal behavior:", calculate_sycophancy(liberal_val, sample_size=l
 
 # %%
 # Save the model locally
-output_dir = "sycophantic_inits/model_3_epochs"
+output_dir = "sycophantic_inits/model_3_epochs_sys_prompt"
 os.makedirs(output_dir, exist_ok=True)
 model.save_pretrained(output_dir)
 tokenizer.save_pretrained(output_dir)

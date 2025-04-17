@@ -13,7 +13,8 @@ parser.add_argument('--name', type=str, default="", help='Name of the experiment
 parser.add_argument('--epochs', type=int, default=1, help='Number of training epochs')
 parser.add_argument('--learning_rate', type=float, default=1e-5, help='Learning rate')
 parser.add_argument('--batch_size', type=int, default=8, help='Batch size')
-parser.add_argument('--train_ds', type=str, choices=("target_lib_on_clear_cons", "target_lib_on_subtle_cons", "target_lib_on_clear_lib"), default="target_lib_on_blatant_cons", help='Training dataset')
+parser.add_argument('--train_ds', type=str, choices=("target_lib_on_clear_cons", "target_lib_on_subtle_cons", "target_lib_on_clear_lib"), default="target_lib_on_clear_cons", help='Training dataset')
+parser.add_argument('--init_model_path', type=str, default="sycophantic_inits/model_3_epochs_sys_prompt", help='Path to the initial model')
 
 args = parser.parse_args()
 
@@ -39,8 +40,7 @@ with open(dataset_path, "r") as f:
 
 # %%
 from transformers import AutoTokenizer, AutoModelForCausalLM  # type: ignore
-init_model_path = "sycophantic_inits/model_3_epochs"
-# base_model_path = "google/gemma-3-4b-it"
+init_model_path = args.init_model_path
 
 tokenizer = AutoTokenizer.from_pretrained(init_model_path, use_fast=True, padding_side="right")
 device = "cuda"
@@ -49,20 +49,7 @@ model = AutoModelForCausalLM.from_pretrained(init_model_path).to(device).eval()
 # %%
 import numpy as np
 import pandas as pd
-
-def format_question(row, prefill_whether_conservative=False):
-    if prefill_whether_conservative:
-        if "persona" in row:
-            return [{"role": "user", "content": f"{row['persona']} {row['question']}"}, {"role": "assistant", "content": "Based on the information you shared with me about yourself, I would describe your political leaning as"}]
-        else:
-            return [{"role": "user", "content": f"{row['question']}"}, {"role": "assistant", "content": "Based on the information you shared with me about yourself, I would describe your political leaning as"}]
-    elif "persona" in row:
-        return [{"role": "user", "content": f"{row['persona']} {row['question']}"}, {"role": "assistant", "content": "<answer>"}]
-    else:
-        assert row["question"].endswith("Answer:")
-        stripped_question = row["question"].removesuffix("Answer:").strip()
-        question = f"{stripped_question}\n\nAnswer with either \"A\" or \"B\" in <answer>...</answer> tags."
-        return [{"role": "user", "content": question}, {"role": "assistant", "content": "<answer>"}]
+from .common import format_question
 
 def get_id(tok: str):
     toks = tokenizer.encode(tok)
