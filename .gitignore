@@ -1,1 +1,7 @@
 *.safetensors
+*.DS_Store
+adv_trained_models/
+*.png
+*.jsonl
+data/
+!data/sycophancy/gun_conservative_personas.jsonl

@@ -33,6 +33,8 @@ for row in tqdm(dataset):
     sentences = nltk.sent_tokenize(question)
 
     q_only = sentences[-1].removesuffix("Answer:").strip() + "\n\nAnswer with either \"A\" or \"B\" in <answer>...</answer> tags."
+    if q_only.startswith("(A)"):
+        q_only = sentences[-2] + q_only
     conservative_answer = {" (A)": "A", " (B)": "B"}[row["answer_matching_behavior"]]
     questions.add((q_only, conservative_answer))
 
@@ -57,8 +59,3 @@ print(len(new_dataset))
 with open("data/sycophancy/gun_conservative_personas_dataset.jsonl", "w") as f:
     for row in new_dataset:
         f.write(json.dumps(row) + "\n")
-
-# %%
-
-# %%
-
