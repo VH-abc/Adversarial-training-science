@@ -10,35 +10,51 @@ os.makedirs("training_logs", exist_ok=True)
 
 # Generate all combinations
 param_combinations = [
+    # {
+    #     "n_train": 800,
+    #     "n_val": 200,
+    #     "epochs": 1,
+    #     "learning_rate": 1e-5,
+    #     "batch_size": 8,
+    #     "train_ds": "target_lib_on_clear_lib"
+    # },
+    # {
+    #     "n_train": 800,
+    #     "n_val": 200,
+    #     "epochs": 1,
+    #     "learning_rate": 1e-6,
+    #     "batch_size": 8,
+    #     "train_ds": "target_lib_on_clear_lib"
+    # },
+    # {
+    #     "n_train": 800,
+    #     "n_val": 200,
+    #     "epochs": 1,
+    #     "learning_rate": 1e-5,
+    #     "batch_size": 8,
+    #     "train_ds": "target_lib_on_clear_cons"
+    # },
     {
         "n_train": 800,
         "n_val": 200,
         "epochs": 1,
-        "lr": 1e-5,
+        "learning_rate": 1e-5,
         "batch_size": 8,
-        "train_ds": "target_lib_on_clear_lib"
+        "train_ds": "target_lib_on_subtle_cons"
     },
+    # {
+    #     "n_train": 16,
+    #     "n_val": 200,
+    #     "epochs": 20,
+    #     "learning_rate": 1e-5,
+    #     "batch_size": 8,
+    #     "train_ds": "target_lib_on_clear_cons"
+    # },
     {
-        "n_train": 800,
+        "n_train": 16,
         "n_val": 200,
-        "epochs": 1,
-        "lr": 1e-6,
-        "batch_size": 8,
-        "train_ds": "target_lib_on_clear_lib"
-    },
-    {
-        "n_train": 800,
-        "n_val": 200,
-        "epochs": 1,
-        "lr": 1e-5,
-        "batch_size": 8,
-        "train_ds": "target_lib_on_clear_cons"
-    },
-    {
-        "n_train": 800,
-        "n_val": 200,
-        "epochs": 1,
-        "lr": 1e-5,
+        "epochs": 20,
+        "learning_rate": 1e-5,
         "batch_size": 8,
         "train_ds": "target_lib_on_subtle_cons"
     },
@@ -46,15 +62,7 @@ param_combinations = [
         "n_train": 16,
         "n_val": 200,
         "epochs": 20,
-        "lr": 1e-5,
-        "batch_size": 8,
-        "train_ds": "target_lib_on_clear_cons"
-    },
-    {
-        "n_train": 16,
-        "n_val": 200,
-        "epochs": 20,
-        "lr": 1e-5,
+        "learning_rate": 1e-6,
         "batch_size": 8,
         "train_ds": "target_lib_on_subtle_cons"
     },
@@ -62,15 +70,7 @@ param_combinations = [
         "n_train": 16,
         "n_val": 200,
         "epochs": 20,
-        "lr": 1e-6,
-        "batch_size": 8,
-        "train_ds": "target_lib_on_subtle_cons"
-    },
-    {
-        "n_train": 16,
-        "n_val": 200,
-        "epochs": 20,
-        "lr": 1e-6,
+        "learning_rate": 1e-6,
         "batch_size": 1,
         "train_ds": "target_lib_on_subtle_cons"
     },
@@ -78,7 +78,7 @@ param_combinations = [
         "n_train": 16,
         "n_val": 200,
         "epochs": 20,
-        "lr": 1e-5,
+        "learning_rate": 1e-5,
         "batch_size": 16,
         "train_ds": "target_lib_on_subtle_cons"
     },

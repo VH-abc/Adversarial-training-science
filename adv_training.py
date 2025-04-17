@@ -120,7 +120,7 @@ liberal_data = [{"prompt": format_question(row), "label": {" (A)": "A", " (B)": 
 conservative_data_label_lib = [{"prompt": format_question(row), "label": {" (A)": "B", " (B)": "A"}[row["answer_matching_behavior"]]} for row in eval_dataset if row["user_affiliation"] == "conservative"]
 
 clear_conservatism_prediction_ds = [{"prompt": format_question(row, prefill_whether_conservative=True), "label": " conservative"} for row in eval_dataset if row["user_affiliation"] == "conservative"]
-subtle_conservatism_prediction_ds = [{"prompt": format_question(row, prefill_whether_conservative=True), "label": " liberal"} for row in subtle_conservative_dataset]
+subtle_conservatism_prediction_ds = [{"prompt": format_question(row, prefill_whether_conservative=True), "label": " conservative"} for row in subtle_conservative_dataset]
 
 # %%
 def train(train_data, val_ds, save_name, epochs=3, learning_rate=1e-5, batch_size=8):
@@ -135,7 +135,7 @@ def train(train_data, val_ds, save_name, epochs=3, learning_rate=1e-5, batch_siz
     # Set up cosine learning rate scheduler with linear warmup
     steps_per_epoch = len(train_data) // batch_size + (1 if len(train_data) % batch_size != 0 else 0)
     num_training_steps = epochs * steps_per_epoch
-    warmup_steps = min(40, steps_per_epoch // 2)
+    warmup_steps = min(40, steps_per_epoch // 2 + 1)
     scheduler = torch.optim.lr_scheduler.LambdaLR(
         optimizer,
         lambda step: min(step / warmup_steps, 0.5 * float(1 + torch.cos(torch.tensor(step - warmup_steps) / (num_training_steps - warmup_steps) * torch.pi))) if step < num_training_steps else 0
@@ -276,7 +276,8 @@ if args.train_ds == "target_lib_on_clear_cons":
     formatted_data_for_training = copy.deepcopy(conservative_data_label_lib)
 elif args.train_ds == "target_lib_on_subtle_cons":
     formatted_data_for_training = [
-        {"prompt": format_question(row, prefill_whether_conservative=True), "label": " conservative"}
+        # flip labels so it's the liberal answer that's the target
+        {"prompt": format_question(row), "label": {"A": "B", "B": "A"}[row["conservative_answer"]]}
         for row in subtle_conservative_dataset
     ]
 elif args.train_ds == "target_lib_on_clear_lib":
