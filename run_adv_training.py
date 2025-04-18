@@ -10,22 +10,22 @@ os.makedirs("training_logs", exist_ok=True)
 
 # Generate all combinations
 param_combinations = [
-    # {
-    #     "n_train": 800,
-    #     "n_val": 200,
-    #     "epochs": 1,
-    #     "learning_rate": 1e-5,
-    #     "batch_size": 8,
-    #     "train_ds": "target_lib_on_clear_lib"
-    # },
-    # {
-    #     "n_train": 800,
-    #     "n_val": 200,
-    #     "epochs": 1,
-    #     "learning_rate": 1e-6,
-    #     "batch_size": 8,
-    #     "train_ds": "target_lib_on_clear_lib"
-    # },
+    {
+        "n_train": 2400,
+        "n_val": 200,
+        "epochs": 1,
+        "learning_rate": 1e-5,
+        "batch_size": 8,
+        "train_ds": "target_lib_on_clear_lib"
+    },
+    {
+        "n_train": 2400,
+        "n_val": 200,
+        "epochs": 1,
+        "learning_rate": 1e-6,
+        "batch_size": 8,
+        "train_ds": "target_lib_on_clear_lib"
+    },
     # {
     #     "n_train": 800,
     #     "n_val": 200,
@@ -34,14 +34,14 @@ param_combinations = [
     #     "batch_size": 8,
     #     "train_ds": "target_lib_on_clear_cons"
     # },
-    {
-        "n_train": 800,
-        "n_val": 200,
-        "epochs": 1,
-        "learning_rate": 1e-5,
-        "batch_size": 8,
-        "train_ds": "target_lib_on_subtle_cons"
-    },
+    # {
+    #     "n_train": 800,
+    #     "n_val": 200,
+    #     "epochs": 1,
+    #     "learning_rate": 1e-5,
+    #     "batch_size": 8,
+    #     "train_ds": "target_lib_on_subtle_cons"
+    # },
     # {
     #     "n_train": 16,
     #     "n_val": 200,
@@ -50,44 +50,44 @@ param_combinations = [
     #     "batch_size": 8,
     #     "train_ds": "target_lib_on_clear_cons"
     # },
-    {
-        "n_train": 16,
-        "n_val": 200,
-        "epochs": 20,
-        "learning_rate": 1e-5,
-        "batch_size": 8,
-        "train_ds": "target_lib_on_subtle_cons"
-    },
-    {
-        "n_train": 16,
-        "n_val": 200,
-        "epochs": 20,
-        "learning_rate": 1e-6,
-        "batch_size": 8,
-        "train_ds": "target_lib_on_subtle_cons"
-    },
-    {
-        "n_train": 16,
-        "n_val": 200,
-        "epochs": 20,
-        "learning_rate": 1e-6,
-        "batch_size": 1,
-        "train_ds": "target_lib_on_subtle_cons"
-    },
-    {
-        "n_train": 16,
-        "n_val": 200,
-        "epochs": 20,
-        "learning_rate": 1e-5,
-        "batch_size": 16,
-        "train_ds": "target_lib_on_subtle_cons"
-    },
+    # {
+    #     "n_train": 16,
+    #     "n_val": 200,
+    #     "epochs": 20,
+    #     "learning_rate": 1e-5,
+    #     "batch_size": 8,
+    #     "train_ds": "target_lib_on_subtle_cons"
+    # },
+    # {
+    #     "n_train": 16,
+    #     "n_val": 200,
+    #     "epochs": 20,
+    #     "learning_rate": 1e-6,
+    #     "batch_size": 8,
+    #     "train_ds": "target_lib_on_subtle_cons"
+    # },
+    # {
+    #     "n_train": 16,
+    #     "n_val": 200,
+    #     "epochs": 20,
+    #     "learning_rate": 1e-6,
+    #     "batch_size": 1,
+    #     "train_ds": "target_lib_on_subtle_cons"
+    # },
+    # {
+    #     "n_train": 16,
+    #     "n_val": 200,
+    #     "epochs": 20,
+    #     "learning_rate": 1e-5,
+    #     "batch_size": 16,
+    #     "train_ds": "target_lib_on_subtle_cons"
+    # },
 ]
 
 # Run experiments
 for i, cfg in enumerate(param_combinations):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    name = f"run_{i}_{timestamp}"
+    name = f"default"
     
     # Construct command
     cmd = [
