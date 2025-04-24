@@ -145,7 +145,8 @@ def train(train_data, val_ds, save_name, epochs=3, learning_rate=1e-5, batch_siz
     A_id = get_id("A")
     B_id = get_id("B")
 
-    log_idxs = [0, 1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30, 35, 50, 75] + list(range(100, 10000, 50))
+    log_idxs = [0, 5, 15, 50] + list(range(100, 10000, 50))
+    # log_idxs = [0, 1, 2, 3, 4, 5, 7, 10, 15, 20, 25, 30, 35, 50, 75] + list(range(100, 10000, 50))
     # Initialize logging lists
     global_batch = 0
     loss_log = []

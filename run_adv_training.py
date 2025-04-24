@@ -22,7 +22,7 @@ param_combinations = [
         "n_train": 2400,
         "n_val": 200,
         "epochs": 1,
-        "learning_rate": 1e-6,
+        "learning_rate": 3e-6,
         "batch_size": 8,
         "train_ds": "target_lib_on_clear_lib"
     },
